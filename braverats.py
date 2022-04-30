@@ -113,7 +113,7 @@ class GameState:
             return None
 
     def game_over(self):
-        return self.who_has_won() is not None or (not self.p1.cards_in_hand and not self.p2.cards_in_hand)
+        return self.who_has_won() is not None or not self.p1.cards_in_hand or not self.p2.cards_in_hand
 
 
 def play_random_game() -> str:
