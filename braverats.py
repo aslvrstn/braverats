@@ -62,6 +62,8 @@ class GameState:
         self.p1.cards_in_hand.remove(p1card)
         self.p2.cards_in_hand.remove(p2card)
 
+        points_for_winning = 1
+
         if p1card == Card.MUSICIAN or p2card == Card.MUSICIAN:
             if p1card == Card.WIZARD:
                 res = "P1"
@@ -69,15 +71,21 @@ class GameState:
                 res = "P2"
             else:
                 res = "PUSH"
+        elif p1card == Card.PRINCESS and p2card == Card.PRINCE:
+            points_for_winning = 9999
+            res = "P1"
+        elif p2card == Card.PRINCESS and p1card == Card.PRINCE:
+            points_for_winning = 9999
+            res = "P2"
         else:
             # Boring case!
             res = self.result(p1card, p2card)
 
         if res == "P1":
-            self.p1.points += self.num_nullified_rounds + 1
+            self.p1.points += self.num_nullified_rounds + points_for_winning
             self.num_nullified_rounds = 0
         elif res == "P2":
-            self.p2.points += self.num_nullified_rounds + 1
+            self.p2.points += self.num_nullified_rounds + points_for_winning
             self.num_nullified_rounds = 0
         elif res == "PUSH":
             self.num_nullified_rounds += 1
