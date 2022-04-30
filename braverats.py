@@ -5,7 +5,7 @@ from typing import Optional, List
 
 
 class Card(Enum):
-    MAGICIAN = 0
+    MUSICIAN = 0
     PRINCESS = 1
     SPY = 2
     ASSASSIN = 3
@@ -16,7 +16,7 @@ class Card(Enum):
 
 
 FULL_HAND = [
-    Card.MAGICIAN,
+    Card.MUSICIAN,
     Card.PRINCESS,
     Card.SPY,
     Card.ASSASSIN,
@@ -62,7 +62,17 @@ class GameState:
         self.p1.cards_in_hand.remove(p1card)
         self.p2.cards_in_hand.remove(p2card)
 
-        res = self.result(p1card, p2card)
+        if p1card == Card.MUSICIAN or p2card == Card.MUSICIAN:
+            if p1card == Card.WIZARD:
+                res = "P1"
+            elif p2card == Card.WIZARD:
+                res = "P2"
+            else:
+                res = "PUSH"
+        else:
+            # Boring case!
+            res = self.result(p1card, p2card)
+
         if res == "P1":
             self.p1.points += self.num_nullified_rounds + 1
             self.num_nullified_rounds = 0
@@ -115,7 +125,7 @@ def play_random_game() -> str:
 
 if __name__ == "__main__":
     win_counts = Counter()
-    for i in range(10000):
+    for i in range(1000):
         winner = play_random_game()
         win_counts[winner] += 1
 
