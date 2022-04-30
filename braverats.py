@@ -64,7 +64,7 @@ class GameState:
 
         points_for_winning = 1
 
-        if p1card == Card.MUSICIAN or p2card == Card.MUSICIAN:
+        if Card.MUSICIAN in [p1card, p2card]:
             if p1card == Card.WIZARD:
                 res = "P1"
             elif p2card == Card.WIZARD:
@@ -77,6 +77,11 @@ class GameState:
         elif p2card == Card.PRINCESS and p1card == Card.PRINCE:
             points_for_winning = 9999
             res = "P2"
+        # MISSING SPY CASE
+        elif Card.ASSASSIN in [p1card, p2card]:
+            res = self.result(p1card, p2card)
+            # Wins turn to losses and vice versa
+            res = {"P1": "P2", "P2": "P1", "PUSH": "PUSH"}[res]
         else:
             # Boring case!
             res = self.result(p1card, p2card)
@@ -133,7 +138,7 @@ def play_random_game() -> str:
 
 if __name__ == "__main__":
     win_counts = Counter()
-    for i in range(1000):
+    for i in range(10):
         winner = play_random_game()
         win_counts[winner] += 1
 
