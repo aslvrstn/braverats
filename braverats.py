@@ -45,13 +45,15 @@ class GameState:
     def __init__(self):
         self.p1 = Player()
         self.p2 = Player()
-        self.num_nullified_rounds = 0
+        self.p1_nullified_cards = []
+        self.p2_nullified_cards = []
 
     def __str__(self):
         return (
             f"P1: {self.p1}\n"
             + f"P2: {self.p2}\n"
-            + f"stack: {self.num_nullified_rounds}"
+            + f"P1 stack: {self.p1_nullified_cards}\n"
+            + f"P2 stack: {self.p2_nullified_cards}"
         )
 
     def play_round(self, p1card: Card, p2card: Card):
@@ -63,18 +65,16 @@ class GameState:
         self.p1.cards_in_hand.remove(p1card)
         self.p2.cards_in_hand.remove(p2card)
 
-        points_for_winning = 1
-
         if Card.WIZARD in [p1card, p2card]:
             res = self.result(p1card, p2card)
         elif Card.MUSICIAN in [p1card, p2card]:
             res = "PUSH"
         elif p1card == Card.PRINCESS and p2card == Card.PRINCE:
-            points_for_winning = 9999
-            res = "P1"
+            self.p1.points = 9999
+            return "P1"
         elif p2card == Card.PRINCESS and p1card == Card.PRINCE:
-            points_for_winning = 9999
-            res = "P2"
+            self.p2.points = 9999
+            return "P2"
         # MISSING SPY CASE
         elif Card.ASSASSIN in [p1card, p2card]:
             if p1card == Card.PRINCE:
@@ -89,14 +89,26 @@ class GameState:
             # Boring case!
             res = self.result(p1card, p2card)
 
+        # For bookkeeping
+        self.p1_nullified_cards += [p1card]
+        self.p2_nullified_cards += [p2card]
+
         if res == "P1":
-            self.p1.points += self.num_nullified_rounds + points_for_winning
-            self.num_nullified_rounds = 0
+            self.p1.points += len(self.p1_nullified_cards)
+            num_ambass = sum(1 for c in self.p1_nullified_cards if c == Card.AMBASSADOR)
+            self.p1.points += num_ambass
+
+            self.p1_nullified_cards = []
+            self.p2_nullified_cards = []
         elif res == "P2":
-            self.p2.points += self.num_nullified_rounds + points_for_winning
-            self.num_nullified_rounds = 0
+            self.p2.points += len(self.p2_nullified_cards)
+            num_ambass = sum(1 for c in self.p2_nullified_cards if c == Card.AMBASSADOR)
+            self.p2.points += num_ambass
+
+            self.p1_nullified_cards = []
+            self.p2_nullified_cards = []
         elif res == "PUSH":
-            self.num_nullified_rounds += 1
+            pass
         else:
             raise ValueError(f"Unknown result: res")
 
