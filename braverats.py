@@ -28,6 +28,7 @@ FULL_HAND = [
 
 
 WINNING_SCORE = 4
+GENERAL_BONUS = 2
 
 
 class Player:
@@ -98,6 +99,16 @@ class GameState:
             self.num_nullified_rounds += 1
         else:
             raise ValueError(f"Unknown result: res")
+
+        self.p1.bonus_for_round = 0
+        self.p2.bonus_for_round = 0
+
+        if p2card != Card.WIZARD:
+            if p1card == Card.GENERAL:
+                self.p1.bonus_for_round = GENERAL_BONUS
+        if p1card != Card.WIZARD:
+            if p2card == Card.GENERAL:
+                self.p2.bonus_for_round = GENERAL_BONUS
 
         return res
 
